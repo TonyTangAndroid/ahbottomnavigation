@@ -29,7 +29,7 @@ android {
     buildToolsVersion '25.0.2'
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 39
         versionName "2.0.6"
@@ -43,7 +43,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:design:25.2.0'
+    compile 'com.android.support:design:25.3.1'
 }
 
 // Place it at the end of the file
