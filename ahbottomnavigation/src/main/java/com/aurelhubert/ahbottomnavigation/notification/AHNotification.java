@@ -14,107 +14,136 @@ import java.util.List;
  */
 public class AHNotification implements Parcelable {
 
-    @Nullable
-    private String text; // can be null, so notification will not be shown
+	public static final Creator<AHNotification> CREATOR = new Creator<AHNotification>() {
+		@Override
+		public AHNotification createFromParcel(Parcel source) {
+			return new AHNotification(source);
+		}
 
-    @ColorInt
-    private int textColor; // if 0 then use default value
+		@Override
+		public AHNotification[] newArray(int size) {
+			return new AHNotification[size];
+		}
+	};
+	@Nullable
+	private String text; // can be null, so notification will not be shown
+	@ColorInt
+	private int textColor; // if 0 then use default value
+	@ColorInt
+	private int backgroundColor; // if 0 then use default value
+	private boolean indicatorOnly; // only show small indicator instead of a notification with a number.
 
-    @ColorInt
-    private int backgroundColor; // if 0 then use default value
+	public AHNotification() {
+		// empty
+	}
 
-    public AHNotification() {
-        // empty
-    }
+	protected AHNotification(Parcel in) {
+		this.text = in.readString();
+		this.textColor = in.readInt();
+		this.backgroundColor = in.readInt();
+		this.indicatorOnly = in.readByte() != 0;
+	}
 
-    private AHNotification(Parcel in) {
-        text = in.readString();
-        textColor = in.readInt();
-        backgroundColor = in.readInt();
-    }
+	public static AHNotification justText(String text) {
+		return new Builder().setText(text).setIndicatorOnly(false).build();
+	}
 
-    public boolean isEmpty() {
-        return TextUtils.isEmpty(text);
-    }
+	public static AHNotification justIndicator() {
+		return new Builder().setText(null).setIndicatorOnly(true).build();
+	}
 
-    public String getText() {
-        return text;
-    }
+	public static List<AHNotification> generateEmptyList(int size) {
+		List<AHNotification> notificationList = new ArrayList<>();
+		for (int i = 0; i < size; i++) {
+			notificationList.add(new AHNotification());
+		}
+		return notificationList;
+	}
 
-    public int getTextColor() {
-        return textColor;
-    }
+	public boolean isIndicatorOnly() {
+		return indicatorOnly;
+	}
 
-    public int getBackgroundColor() {
-        return backgroundColor;
-    }
+	public boolean isEmpty() {
+		return TextUtils.isEmpty(text);
+	}
 
-    public static AHNotification justText(String text) {
-        return new Builder().setText(text).build();
-    }
+	@Nullable
+	public String getText() {
+		return text;
+	}
 
-    public static List<AHNotification> generateEmptyList(int size) {
-        List<AHNotification> notificationList = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            notificationList.add(new AHNotification());
-        }
-        return notificationList;
-    }
+	public int getTextColor() {
+		return textColor;
+	}
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+	public int getBackgroundColor() {
+		return backgroundColor;
+	}
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(text);
-        dest.writeInt(textColor);
-        dest.writeInt(backgroundColor);
-    }
+	@Override
+	public int describeContents() {
+		return 0;
+	}
 
-    public static class Builder {
-        @Nullable
-        private String text;
-        @ColorInt
-        private int textColor;
-        @ColorInt
-        private int backgroundColor;
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.text);
+		dest.writeInt(this.textColor);
+		dest.writeInt(this.backgroundColor);
+		dest.writeByte(this.indicatorOnly ? (byte) 1 : (byte) 0);
+	}
 
-        public Builder setText(String text) {
-            this.text = text;
-            return this;
-        }
+	public static class Builder {
+		@Nullable
+		private String text;
+		@ColorInt
+		private int textColor;
+		@ColorInt
+		private int backgroundColor;
 
-        public Builder setTextColor(@ColorInt int textColor) {
-            this.textColor = textColor;
-            return this;
-        }
+		private boolean indicatorOnly;
 
-        public Builder setBackgroundColor(@ColorInt int backgroundColor) {
-            this.backgroundColor = backgroundColor;
-            return this;
-        }
+		public Builder setText(String text) {
 
-        public AHNotification build() {
-            AHNotification notification = new AHNotification();
-            notification.text = text;
-            notification.textColor = textColor;
-            notification.backgroundColor = backgroundColor;
-            return notification;
-        }
-    }
+			if (!TextUtils.isEmpty(text) && indicatorOnly) {
+				throw new RuntimeException("Notification and Indicator should not be shown at the same time");
+			}
+			this.text = text;
+			return this;
+		}
 
-    public static final Creator<AHNotification> CREATOR = new Creator<AHNotification>() {
-        @Override
-        public AHNotification createFromParcel(Parcel in) {
-            return new AHNotification(in);
-        }
+		public Builder setIndicatorOnly(boolean indicatorOnly) {
+			if (!TextUtils.isEmpty(text) && indicatorOnly) {
+				throw new RuntimeException("Notification and Indicator should not be shown at the same time");
+			}
 
-        @Override
-        public AHNotification[] newArray(int size) {
-            return new AHNotification[size];
-        }
-    };
+			this.indicatorOnly = indicatorOnly;
+			return this;
+		}
 
+
+		public Builder setTextColor(@ColorInt int textColor) {
+			this.textColor = textColor;
+			return this;
+		}
+
+		public Builder setBackgroundColor(@ColorInt int backgroundColor) {
+			this.backgroundColor = backgroundColor;
+			return this;
+		}
+
+		public AHNotification build() {
+			if (!TextUtils.isEmpty(text) && indicatorOnly) {
+				throw new RuntimeException("Notification and Indicator should not be shown at the same time");
+			}
+
+			AHNotification notification = new AHNotification();
+			notification.text = text;
+			notification.textColor = textColor;
+			notification.backgroundColor = backgroundColor;
+			notification.indicatorOnly = indicatorOnly;
+			return notification;
+		}
+	}
 }
