@@ -102,7 +102,7 @@ public class DemoActivity extends AppCompatActivity {
 				currentFragment.willBeDisplayed();
 
 				if (position == 1) {
-					bottomNavigation.setNotification("", 1);
+					bottomNavigation.setNotification("", 1, false);
 
 					floatingActionButton.setVisibility(View.VISIBLE);
 					floatingActionButton.setAlpha(0f);
@@ -194,19 +194,31 @@ public class DemoActivity extends AppCompatActivity {
 			@Override
 			public void run() {
 				// Setting custom colors for notification
-				AHNotification notification = new AHNotification.Builder()
-						.setText(":)")
-						.setBackgroundColor(ContextCompat.getColor(DemoActivity.this, R.color.color_notification_back))
-						.setTextColor(ContextCompat.getColor(DemoActivity.this, R.color.color_notification_text))
-						.build();
-				bottomNavigation.setNotification(notification, 1);
+				showLol();
+				showIndicator();
 				Snackbar.make(bottomNavigation, "Snackbar with bottom navigation",
 						Snackbar.LENGTH_SHORT).show();
 
 			}
-		}, 3000);
+		}, 1000);
 
 		//bottomNavigation.setDefaultBackgroundResource(R.drawable.bottom_navigation_background);
+	}
+
+	private void showIndicator() {
+		AHNotification notification = new AHNotification.Builder()
+				.setIndicatorOnly(true)
+				.build();
+		bottomNavigation.setNotification(notification, 0);
+	}
+
+	private void showLol() {
+		AHNotification notification = new AHNotification.Builder()
+				.setText(":)")
+				.setBackgroundColor(ContextCompat.getColor(DemoActivity.this, R.color.color_notification_back))
+				.setTextColor(ContextCompat.getColor(DemoActivity.this, R.color.color_notification_text))
+				.build();
+		bottomNavigation.setNotification(notification, 1);
 	}
 
 	/**
@@ -232,7 +244,7 @@ public class DemoActivity extends AppCompatActivity {
 			if (addItems) {
 				navigationAdapter = new AHBottomNavigationAdapter(this, R.menu.bottom_navigation_menu_5);
 				navigationAdapter.setupWithBottomNavigation(bottomNavigation, tabColors);
-				bottomNavigation.setNotification("1", 3);
+				bottomNavigation.setNotification("8", 3, false);
 			} else {
 				navigationAdapter = new AHBottomNavigationAdapter(this, R.menu.bottom_navigation_menu_3);
 				navigationAdapter.setupWithBottomNavigation(bottomNavigation, tabColors);
@@ -249,7 +261,7 @@ public class DemoActivity extends AppCompatActivity {
 
 				bottomNavigation.addItem(item4);
 				bottomNavigation.addItem(item5);
-				bottomNavigation.setNotification("1", 3);
+				bottomNavigation.setNotification("9", 3, false);
 			} else {
 				bottomNavigation.removeAllItems();
 				bottomNavigation.addItems(bottomNavigationItems);
