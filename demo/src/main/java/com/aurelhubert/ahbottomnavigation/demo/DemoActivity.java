@@ -3,7 +3,6 @@ package com.aurelhubert.ahbottomnavigation.demo;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -11,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 
@@ -53,19 +51,15 @@ public class DemoActivity extends AppCompatActivity {
 		super.onDestroy();
 		handler.removeCallbacksAndMessages(null);
 	}
-	
+
 	/**
 	 * Init UI
 	 */
 	private void initUI() {
-		
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-			AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-		}
-		
-		bottomNavigation = findViewById(R.id.bottom_navigation);
-		viewPager = findViewById(R.id.view_pager);
-		floatingActionButton = findViewById(R.id.floating_action_button);
+
+		bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
+		viewPager = (AHBottomNavigationViewPager) findViewById(R.id.view_pager);
+		floatingActionButton = (FloatingActionButton) findViewById(R.id.floating_action_button);
 
 		if (useMenuResource) {
 			tabColors = getApplicationContext().getResources().getIntArray(R.array.tab_colors);
@@ -104,16 +98,11 @@ public class DemoActivity extends AppCompatActivity {
 				}
 
 				viewPager.setCurrentItem(position, false);
-				
-				if (currentFragment == null) {
-					return true;
-				}
-				
 				currentFragment = adapter.getCurrentFragment();
 				currentFragment.willBeDisplayed();
 
 				if (position == 1) {
-					bottomNavigation.setNotification("", 1);
+					bottomNavigation.setNotification("", 1, false);
 
 					floatingActionButton.setVisibility(View.VISIBLE);
 					floatingActionButton.setAlpha(0f);
@@ -186,7 +175,7 @@ public class DemoActivity extends AppCompatActivity {
 				return true;
 			}
 		});
-		
+
 		/*
 		bottomNavigation.setOnNavigationPositionListener(new AHBottomNavigation.OnNavigationPositionListener() {
 			@Override public void onPositionChange(int y) {
@@ -205,19 +194,31 @@ public class DemoActivity extends AppCompatActivity {
 			@Override
 			public void run() {
 				// Setting custom colors for notification
-				AHNotification notification = new AHNotification.Builder()
-						.setText(":)")
-						.setBackgroundColor(ContextCompat.getColor(DemoActivity.this, R.color.color_notification_back))
-						.setTextColor(ContextCompat.getColor(DemoActivity.this, R.color.color_notification_text))
-						.build();
-				bottomNavigation.setNotification(notification, 1);
+				showLol();
+				showIndicator();
 				Snackbar.make(bottomNavigation, "Snackbar with bottom navigation",
 						Snackbar.LENGTH_SHORT).show();
 
 			}
-		}, 3000);
-		
+		}, 1000);
+
 		//bottomNavigation.setDefaultBackgroundResource(R.drawable.bottom_navigation_background);
+	}
+
+	private void showIndicator() {
+		AHNotification notification = new AHNotification.Builder()
+				.setIndicatorOnly(true)
+				.build();
+		bottomNavigation.setNotification(notification, 0);
+	}
+
+	private void showLol() {
+		AHNotification notification = new AHNotification.Builder()
+				.setText(":)")
+				.setBackgroundColor(ContextCompat.getColor(DemoActivity.this, R.color.color_notification_back))
+				.setTextColor(ContextCompat.getColor(DemoActivity.this, R.color.color_notification_text))
+				.build();
+		bottomNavigation.setNotification(notification, 1);
 	}
 
 	/**
@@ -243,7 +244,7 @@ public class DemoActivity extends AppCompatActivity {
 			if (addItems) {
 				navigationAdapter = new AHBottomNavigationAdapter(this, R.menu.bottom_navigation_menu_5);
 				navigationAdapter.setupWithBottomNavigation(bottomNavigation, tabColors);
-				bottomNavigation.setNotification("1", 3);
+				bottomNavigation.setNotification("8", 3, false);
 			} else {
 				navigationAdapter = new AHBottomNavigationAdapter(this, R.menu.bottom_navigation_menu_3);
 				navigationAdapter.setupWithBottomNavigation(bottomNavigation, tabColors);
@@ -260,7 +261,7 @@ public class DemoActivity extends AppCompatActivity {
 
 				bottomNavigation.addItem(item4);
 				bottomNavigation.addItem(item5);
-				bottomNavigation.setNotification("1", 3);
+				bottomNavigation.setNotification("9", 3, false);
 			} else {
 				bottomNavigation.removeAllItems();
 				bottomNavigation.addItems(bottomNavigationItems);
@@ -287,10 +288,11 @@ public class DemoActivity extends AppCompatActivity {
 	}
 
 	/**
-	 * Set title state for bottomNavigation
+	 * Show or hide selected item background
 	 */
-	public void setTitleState(AHBottomNavigation.TitleState titleState) {
-		bottomNavigation.setTitleState(titleState);
+	public void setForceTitleHide(boolean forceTitleHide) {
+		AHBottomNavigation.TitleState state = forceTitleHide ? AHBottomNavigation.TitleState.ALWAYS_HIDE : AHBottomNavigation.TitleState.ALWAYS_SHOW;
+		bottomNavigation.setTitleState(state);
 	}
 
 	/**
